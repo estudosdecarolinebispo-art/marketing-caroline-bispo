@@ -1,97 +1,94 @@
 /**
- * ARQUIVO: script.js
- * CLIENTE: Caroline Bispo - Especialista em Google Ads
- * FUNÇÃO: Controle de interatividade, navegação suave e métricas de conversão.
+ * Interações e eventos de conversão — Caroline Bispo.
+ * Os links são identificados por data-track, sem depender do domínio da agenda.
  */
 
-document.addEventListener('DOMContentLoaded', () => {
-    
-    // 1. GERENCIAMENTO DA NAVBAR (EFEITO SCROLL)
-    const navbar = document.querySelector('nav');
-    
-    window.addEventListener('scroll', () => {
-        // Adiciona sombra e fundo sólido ao rolar a página
-        if (window.scrollY > 50) {
-            navbar.classList.add('shadow-lg', 'bg-white');
-            navbar.classList.remove('bg-white/90');
-        } else {
-            navbar.classList.remove('shadow-lg', 'bg-white');
-            navbar.classList.add('bg-white/90');
-        }
-    });
+(function () {
+    "use strict";
 
-    // 2. NAVEGAÇÃO SUAVE (SMOOTH SCROLL)
-    // Faz com que os links 'Início', 'Sobre Mim' e 'Contato' deslizem suavemente
-    const links = document.querySelectorAll('a[href^="#"]');
-    
-    links.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href');
-            const targetElement = document.querySelector(targetId);
-            
-            if (targetElement) {
-                const offset = 80; // Compensação da altura da navbar fixa
-                const elementPosition = targetElement.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset - offset;
+    function trackConversion(eventName, details) {
+        var eventData = Object.assign({
+            event: eventName,
+            page_path: window.location.pathname
+        }, details || {});
 
-                window.scrollTo({
-                    top: offsetPosition,
-                    behavior: 'smooth'
-                });
-            }
-        });
-    });
-
-    // 3. EFEITOS NOS BOTÕES DE AGENDAMENTO (CALENDLY)
-    // Garante que o clique nos botões de diagnóstico abra em nova aba e registre a intenção
-    const btnAgendamento = document.querySelectorAll('a[href*="calendly.com"]');
-    
-    btnAgendamento.forEach(btn => {
-        btn.addEventListener('click', () => {
-            console.log("Lead interessado em Diagnóstico Estratégico iniciado.");
-            // Aqui você poderia inserir uma tag de conversão do Google Ads no futuro
-        });
-    });
-
-    // 4. BOTÃO FLUTUANTE WHATSAPP
-    // Animação extra ao carregar a página para atrair o olhar
-    const whatsappBtn = document.querySelector('.whatsapp-float');
-    if (whatsappBtn) {
-        setTimeout(() => {
-            whatsappBtn.classList.add('animate-bounce');
-        }, 3000);
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push(eventData);
+        window.dispatchEvent(new CustomEvent("caroline:conversion", { detail: eventData }));
     }
 
-    // 5. OBSERVER PARA ANIMAÇÕES AO ROLAR (REVEAL)
-    // Faz com que os cartões de "Dor" e "Solução" apareçam conforme o usuário desce a página
-    const revealElements = document.querySelectorAll('.card-red, .card-green');
-    
-    const revealCallback = (entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.opacity = '1';
-                entry.target.style.transform = 'translateY(0)';
-                observer.unobserve(entry.target);
+    document.addEventListener("DOMContentLoaded", function () {
+        var header = document.querySelector(".site-header");
+        var year = document.getElementById("current-year");
+
+        if (year) {
+            year.textContent = String(new Date().getFullYear());
+        }
+
+        function updateHeader() {
+            if (header) {
+                header.classList.toggle("is-scrolled", window.scrollY > 18);
             }
+        }
+
+        updateHeader();
+        window.addEventListener("scroll", updateHeader, { passive: true });
+
+        document.querySelectorAll('a[href^="#"]').forEach(function (link) {
+            link.addEventListener("click", function (event) {
+                var selector = link.getAttribute("href");
+                if (!selector || selector === "#") return;
+
+                var target = document.querySelector(selector);
+                if (!target) return;
+
+                event.preventDefault();
+                target.scrollIntoView({ behavior: "smooth", block: "start" });
+                history.replaceState(null, "", selector);
+            });
         });
-    };
 
-    const revealObserver = new IntersectionObserver(revealCallback, {
-        threshold: 0.1
+        document.querySelectorAll("[data-track]").forEach(function (element) {
+            element.addEventListener("click", function () {
+                trackConversion(element.dataset.track, {
+                    click_location: element.dataset.location || "unknown",
+                    destination: element.getAttribute("href") || "inline_calendar",
+                    link_text: element.textContent.trim()
+                });
+            });
+        });
+
+        var revealItems = document.querySelectorAll(".pain-card, .steps-list li, .faq-list details");
+        var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        if ("IntersectionObserver" in window && !reduceMotion) {
+            revealItems.forEach(function (item) { item.classList.add("reveal"); });
+
+            var observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("is-visible");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.12, rootMargin: "0px 0px -30px" });
+
+            revealItems.forEach(function (item) { observer.observe(item); });
+        }
+
+        var calendar = document.getElementById("my-cal-inline-agendamentos");
+        if (calendar && "IntersectionObserver" in window) {
+            var calendarObserver = new IntersectionObserver(function (entries) {
+                if (entries.some(function (entry) { return entry.isIntersecting; })) {
+                    trackConversion("schedule_view", {
+                        click_location: "cal_embed",
+                        destination: "caroline-bispo/agendamentos"
+                    });
+                    calendarObserver.disconnect();
+                }
+            }, { threshold: 0.2 });
+
+            calendarObserver.observe(calendar);
+        }
     });
-
-    revealElements.forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(20px)';
-        el.style.transition = 'all 0.6s ease-out';
-        revealObserver.observe(el);
-    });
-
-});
-
-/**
- * DICA DE MANUTENÇÃO:
- * Se você mudar o link do Calendly ou o número do WhatsApp, 
- * altere diretamente no HTML. Este script cuida apenas do comportamento visual.
- */
+})();
