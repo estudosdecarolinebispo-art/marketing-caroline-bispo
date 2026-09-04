@@ -967,8 +967,8 @@ summary:focus-visible {
 
 .footer-grid {
     display: grid;
-    grid-template-columns: 1.35fr 1fr 1fr;
-    gap: 60px;
+    grid-template-columns: 1.35fr 0.9fr 0.9fr 1fr;
+    gap: 36px;
 }
 
 .brand-footer {
@@ -1005,6 +1005,10 @@ summary:focus-visible {
 .footer-grid a:not(.brand) {
     color: #c3cfdd;
     text-decoration: none;
+}
+
+.footer-grid a:not(.brand):focus-visible {
+    color: var(--white);
 }
 
 .footer-grid a:hover {
