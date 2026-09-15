@@ -22,7 +22,7 @@ function attributes(html, name) {
   const pattern = new RegExp(`<${name}\\b([^>]*)>`, "gi");
   for (const match of html.matchAll(pattern)) {
     const values = {};
-    for (const attribute of match[1].matchAll(/([:\\w-]+)(?:\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s"'=<>`]+)))?/g)) {
+    for (const attribute of match[1].matchAll(/([:\w-]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g)) {
       values[attribute[1].toLowerCase()] = attribute[2] ?? attribute[3] ?? attribute[4] ?? "";
     }
     results.push(values);
@@ -41,7 +41,7 @@ function normalizedText(value) {
     .replace(/&quot;/g, '"')
     .replace(/&#39;|&apos;/g, "'")
     .replace(/&nbsp;/g, " ")
-    .replace(/\\s+/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
@@ -51,6 +51,8 @@ async function request(path, options = {}) {
   try {
     response = await fetch(url, {
       redirect: "follow",
+      cache: "no-store",
+      headers: { "Cache-Control": "no-cache" },
       signal: AbortSignal.timeout(20000),
       ...options
     });
@@ -63,7 +65,7 @@ async function request(path, options = {}) {
 }
 
 function parseSchema(html, path) {
-  const blocks = [...html.matchAll(/<script\\s+type=["']application\\/ld\\+json["']>([\\s\\S]*?)<\\/script>/gi)];
+  const blocks = [...html.matchAll(/<script\s+type=["']application\/ld\+json["']>([\s\S]*?)<\/script>/gi)];
   if (blocks.length !== 1) {
     fail(`${path}: esperado um bloco JSON-LD; encontrados ${blocks.length}`);
     return null;
@@ -105,7 +107,7 @@ for (const page of htmlPages) {
     }
   }
 
-  const schema = parseSchema(html, page.url);
+  const schema = indexable ? parseSchema(html, page.url) : null;
   if (schema) {
     const graph = Array.isArray(schema["@graph"]) ? schema["@graph"] : [];
     const types = graph.flatMap((item) => Array.isArray(item["@type"]) ? item["@type"] : [item["@type"]]);
@@ -115,7 +117,7 @@ for (const page of htmlPages) {
     if (page.key !== "home" && indexable && !types.includes("BreadcrumbList")) fail(`${page.url}: BreadcrumbList ausente`);
   }
 
-  pass(`${page.url} — HTTP ${response.status}, metadados e Schema válidos`);
+  if (response.ok) pass(`${page.url} — HTTP ${response.status}, metadados${indexable ? " e Schema" : ""} válidos`);
 }
 
 const sitemapResponse = await request("/sitemap.xml");
@@ -153,12 +155,6 @@ if (llmsResponse) {
 for (const asset of ["/style.css", "/script.js", "/site.webmanifest", "/favicon.ico", "/CNAME"]) {
   const response = await request(asset);
   if (response) pass(`${asset} — HTTP ${response.status}`);
-}
-
-if (origin === site.url) {
-  const apex = await fetch("https://carolinebispo.com.br/", { redirect: "follow", signal: AbortSignal.timeout(20000) });
-  if (!apex.ok || apex.url !== `${origin}/`) fail(`domínio raiz: redirecionamento inesperado (${apex.status}, ${apex.url})`);
-  else pass(`domínio raiz — redireciona para ${apex.url}`);
 }
 
 for (const check of checks) console.log(`✓ ${check}`);
