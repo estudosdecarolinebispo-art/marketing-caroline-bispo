@@ -1,0 +1,56 @@
+        <section class="page-hero">
+            <div class="hero-glow hero-glow-one" aria-hidden="true"></div>
+            <div class="container">
+                {% include "partials/breadcrumbs.njk" %}
+                <div class="page-hero-grid">
+                    <div>
+                        <p class="eyebrow">Contato</p>
+                        <h1>{{ pages.entries.contact.h1 }}</h1>
+                        <p class="page-hero-lead">Explique a necessidade pelo canal que for mais confortável. O atendimento parte das informações confirmadas sobre o negócio e do objetivo que você pretende trabalhar.</p>
+                    </div>
+                    <div class="page-summary">
+                        <span>Atendimento</span>
+                        <p>Referência regional em Franco da Rocha e cidades próximas, sem endereço público divulgado.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section contact-section">
+            <div class="container contact-grid">
+                <div>
+                    <p class="eyebrow eyebrow-dark">Canais diretos</p>
+                    <h2>Escolha como prefere conversar.</h2>
+                    <p class="lead-paragraph">Se a necessidade for um diagnóstico do Perfil da Empresa no Google, use a página específica. Para os demais serviços, conte brevemente o contexto pelo WhatsApp ou e-mail.</p>
+                </div>
+                <div class="contact-methods">
+                    <a class="contact-method contact-method-primary" href="{{ site.links.whatsapp }}" target="_blank" rel="noopener noreferrer" data-track="whatsapp_click" data-location="contact_page"><span>WhatsApp</span><strong>{{ site.contact.phoneDisplay }}</strong><em>Iniciar conversa →</em></a>
+                    <a class="contact-method" href="mailto:{{ site.contact.email }}"><span>E-mail</span><strong>{{ site.contact.email }}</strong><em>Escrever mensagem →</em></a>
+                    <a class="contact-method" href="/diagnostico-google-meu-negocio/"><span>Diagnóstico gratuito</span><strong>Perfil da Empresa no Google</strong><em>Ver como funciona →</em></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section contact-context-section">
+            <div class="container split-heading">
+                <div><p class="eyebrow eyebrow-dark">Para aproveitar a conversa</p><h2>Traga o contexto que já estiver disponível.</h2></div>
+                <ul class="plain-check-list">
+                    <li>Qual é o negócio e o que ele oferece.</li>
+                    <li>Qual canal ou etapa hoje gera mais dúvida.</li>
+                    <li>O que você espera melhorar com o trabalho.</li>
+                    <li>Quais ativos já existem, como perfil, site, campanhas ou fluxo de atendimento.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section booking-section" id="agendamento">
+            <div class="container booking-heading">
+                <div>
+                    <p class="eyebrow">Agendamento</p>
+                    <h2 id="agendamento-titulo">Prefere escolher um horário?</h2>
+                    <p>Use a agenda para selecionar um momento disponível para a conversa.</p>
+                </div>
+                <a class="button button-whatsapp" href="{{ site.links.whatsapp }}" target="_blank" rel="noopener noreferrer" data-track="whatsapp_click" data-location="contact_booking">Ou fale pelo WhatsApp</a>
+            </div>
+            {% include "components/cal-embed.njk" %}
+        </section>

@@ -1,0 +1,92 @@
+{% set pageInfo = pages.entries[pageKey] %}
+{% set canonicalUrl = site.url + pageInfo.url %}
+{% if serviceKey %}{% set currentService = services.items[serviceKey] %}{% endif %}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Person",
+          "@id": "{{ site.url }}/#caroline",
+          "name": "{{ site.name }}",
+          "url": "{{ site.url }}/",
+          "description": "Profissional de marketing digital para negócios locais.",
+          "image": {"@id": "{{ site.url }}/#foto-caroline"},
+          "telephone": "+55 11 98056-9539",
+          "email": "mailto:{{ site.contact.email }}",
+          "knowsAbout": [
+{% for key in services.order %}            {"@id": "{{ site.url }}{{ services.items[key].url }}#service"}{% if not loop.last %},{% endif %}
+{% endfor %}          ],
+          "sameAs": [
+            "{{ site.links.instagram }}",
+            "{{ site.links.facebook }}"
+          ]{% if pageKey == "about" %},
+          "mainEntityOfPage": {"@id": "{{ canonicalUrl }}#webpage"}{% endif %}
+        },
+        {
+          "@type": "WebSite",
+          "@id": "{{ site.url }}/#website",
+          "url": "{{ site.url }}/",
+          "name": "{{ site.name }}",
+          "description": "{{ site.description }}",
+          "inLanguage": "{{ site.language }}",
+          "publisher": {"@id": "{{ site.url }}/#caroline"}
+        },
+        {
+          "@type": "{{ schemaPageType or 'WebPage' }}",
+          "@id": "{{ canonicalUrl }}#webpage",
+          "url": "{{ canonicalUrl }}",
+          "name": "{{ pageInfo.title }}",
+          "description": "{{ pageInfo.description }}",
+          "inLanguage": "{{ site.language }}",
+          "isPartOf": {"@id": "{{ site.url }}/#website"},
+          "primaryImageOfPage": {"@id": "{{ site.url }}/#foto-caroline"}{% if pageKey == "about" or pageKey == "contact" %},
+          "mainEntity": {"@id": "{{ site.url }}/#caroline"}{% elif serviceKey %},
+          "mainEntity": {"@id": "{{ canonicalUrl }}#service"}{% elif pageKey == "diagnostic" %},
+          "about": {"@id": "{{ site.url }}{{ services.items.profile.url }}#service"}{% elif pageKey == "services" or pageKey == "home" %},
+          "hasPart": [
+{% for key in services.order %}            {"@id": "{{ site.url }}{{ services.items[key].url }}#service"}{% if not loop.last %},{% endif %}
+{% endfor %}          ]{% endif %}{% if not isHome %},
+          "breadcrumb": {"@id": "{{ canonicalUrl }}#breadcrumb"}{% endif %}
+        },
+        {
+          "@type": "ImageObject",
+          "@id": "{{ site.url }}/#foto-caroline",
+          "url": "{{ site.url }}/images/caroline-bispo-perfil-1200.jpg",
+          "contentUrl": "{{ site.url }}/images/caroline-bispo-perfil-1200.jpg",
+          "width": 1200,
+          "height": 1200
+        }{% if not isHome %},
+        {
+          "@type": "BreadcrumbList",
+          "@id": "{{ canonicalUrl }}#breadcrumb",
+          "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site.url }}/"}{% if breadcrumbParentUrl %},
+            {"@type": "ListItem", "position": 2, "name": "{{ breadcrumbParentLabel }}", "item": "{{ site.url }}{{ breadcrumbParentUrl }}"},
+            {"@type": "ListItem", "position": 3, "name": "{{ breadcrumbLabel }}", "item": "{{ canonicalUrl }}"}{% else %},
+            {"@type": "ListItem", "position": 2, "name": "{{ breadcrumbLabel }}", "item": "{{ canonicalUrl }}"}{% endif %}
+          ]
+        }{% endif %}{% if serviceKey %},
+        {
+          "@type": "Service",
+          "@id": "{{ canonicalUrl }}#service",
+          "name": "{{ currentService.name }}",
+          "serviceType": "{{ currentService.name }}",
+          "url": "{{ canonicalUrl }}",
+          "description": "{{ currentService.lead }}",
+          "provider": {"@id": "{{ site.url }}/#caroline"},
+          "audience": {"@type": "Audience", "audienceType": "Negócios locais"}
+        }{% elif pageKey == "services" %}{% for key in services.order %},
+        {
+          "@type": "Service",
+          "@id": "{{ site.url }}{{ services.items[key].url }}#service",
+          "name": "{{ services.items[key].name }}",
+          "serviceType": "{{ services.items[key].name }}",
+          "url": "{{ site.url }}{{ services.items[key].url }}",
+          "description": "{{ services.items[key].lead }}",
+          "provider": {"@id": "{{ site.url }}/#caroline"},
+          "audience": {"@type": "Audience", "audienceType": "Negócios locais"}
+        }{% endfor %}{% endif %}
+      ]
+    }
+    </script>

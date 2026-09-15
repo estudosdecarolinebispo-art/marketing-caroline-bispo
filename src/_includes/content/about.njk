@@ -1,0 +1,69 @@
+        <section class="page-hero">
+            <div class="hero-glow hero-glow-one" aria-hidden="true"></div>
+            <div class="container">
+                {% include "partials/breadcrumbs.njk" %}
+                <div class="page-hero-grid">
+                    <div>
+                        <p class="eyebrow">Sobre Caroline Bispo</p>
+                        <h1>{{ pages.entries.about.h1 }}</h1>
+                        <p class="page-hero-lead">Marketing digital pensado a partir da realidade de empresas físicas e prestadores de serviços que precisam conectar presença, aquisição e atendimento.</p>
+                    </div>
+                    <div class="page-summary">
+                        <span>Atuação</span>
+                        <p>Presença no Google, SEO Local, tráfego pago e automação de atendimento para negócios locais.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container about-grid about-page-grid">
+                <div class="portrait-wrap">
+                    <div class="portrait-accent" aria-hidden="true"></div>
+                    {% include "components/profile-picture.njk" %}
+                    <p><strong>Caroline Bispo</strong><span>Marketing Digital para Negócios Locais</span></p>
+                </div>
+                <div class="about-copy">
+                    <p class="eyebrow eyebrow-dark">Trajetória e atuação</p>
+                    <h2>Do problema percebido à prioridade que pode ser executada.</h2>
+                    <p>O trabalho de Caroline Bispo parte de um princípio simples: antes de escolher uma ferramenta, é preciso entender como o negócio é encontrado, o que comunica e como responde quando uma oportunidade aparece.</p>
+                    <p>Sua atuação está concentrada em marketing digital para negócios locais. Isso inclui empresas físicas e prestadores de serviços que precisam tornar sua presença mais clara para pessoas da região, organizar campanhas e melhorar o caminho até o atendimento.</p>
+                    <p>Em vez de aplicar a mesma solução a todos os cenários, a abordagem conecta quatro frentes conforme a necessidade: Perfil da Empresa no Google, SEO Local e Google Maps, gestão de tráfego pago e automação de atendimento para WhatsApp.</p>
+                    <div class="location-box">
+                        <strong>Atendimento regional confirmado</strong>
+                        <span>Franco da Rocha, Caieiras, Francisco Morato, Mairiporã e cidades próximas.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section process-section">
+            <div class="container section-heading centered-heading">
+                <p class="eyebrow">Forma de trabalho</p>
+                <h2>Clareza antes de complexidade.</h2>
+                <p>Cada projeto precisa de escopo, contexto e limites compreensíveis.</p>
+            </div>
+            <ol class="container editorial-steps">
+                <li><span>01</span><div><h3>Entender</h3><p>Conhecer o momento, o público, a oferta e a capacidade de atendimento do negócio.</p></div></li>
+                <li><span>02</span><div><h3>Priorizar</h3><p>Separar o que é urgente do que pode ser desenvolvido com continuidade.</p></div></li>
+                <li><span>03</span><div><h3>Executar</h3><p>Aplicar as melhorias acordadas sem inventar dados, promessas ou integrações.</p></div></li>
+                <li><span>04</span><div><h3>Acompanhar</h3><p>Observar o que muda e ajustar as próximas decisões com base no contexto disponível.</p></div></li>
+            </ol>
+        </section>
+
+        <section class="section services-section">
+            <div class="container section-heading-row">
+                <div><p class="eyebrow eyebrow-dark">Especialidades</p><h2>Quatro serviços que podem atuar separados ou em conjunto.</h2></div>
+                <a class="text-link" href="/servicos/">Comparar os serviços <span aria-hidden="true">→</span></a>
+            </div>
+            <div class="container compact-service-links">
+{% for key in services.order %}{% set service = services.items[key] %}                <a href="{{ service.url }}"><span>{{ service.number }}</span><strong>{{ service.name }}</strong><small>{{ service.eyebrow }}</small></a>
+{% endfor %}            </div>
+        </section>
+
+        <section class="final-cta institutional-final-cta">
+            <div class="container final-cta-inner">
+                <div><p class="eyebrow">Próximo passo</p><h2>Comece pela necessidade mais clara do seu negócio.</h2><p>Veja os serviços, solicite o diagnóstico gratuito ou fale diretamente com Caroline.</p></div>
+                <div class="cta-group"><a class="button button-primary button-large" href="/diagnostico-google-meu-negocio/">Diagnóstico gratuito</a><a class="button button-secondary" href="/contato/">Entrar em contato</a></div>
+            </div>
+        </section>

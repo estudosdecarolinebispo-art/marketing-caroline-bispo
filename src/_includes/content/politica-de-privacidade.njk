@@ -1,34 +1,4 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Política de Privacidade | Caroline Bispo</title>
-    <meta name="description" content="Saiba como Caroline Bispo coleta, utiliza, protege e exclui dados pessoais no site e nos atendimentos realizados pelo WhatsApp.">
-    <meta name="author" content="Caroline Bispo">
-    <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#071b33">
-    <link rel="canonical" href="https://carolinebispo.com.br/politica-de-privacidade.html">
-    <link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="stylesheet" href="/style.css">
-    <link rel="stylesheet" href="/legal.css">
-</head>
-<body class="legal-page">
-    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
-
-    <header class="site-header">
-        <div class="container legal-header-inner">
-            <a class="brand" href="/" aria-label="Caroline Bispo — página inicial">
-                <img class="brand-logo" src="/images/logo-caroline-bispo-localizacao.png" alt="Caroline Bispo" width="1200" height="393">
-            </a>
-            <a class="button legal-back" href="/">Voltar ao site</a>
-        </div>
-    </header>
-
-    <main id="conteudo">
-        <section class="legal-hero">
+<section class="legal-hero">
             <div class="container legal-hero-inner">
                 <p class="legal-kicker">Privacidade e proteção de dados</p>
                 <h1>Política de Privacidade</h1>
@@ -62,7 +32,7 @@
                         <p>Caroline Bispo é responsável pelo site <strong>carolinebispo.com.br</strong> e pelos atendimentos oferecidos por seus canais digitais. Para fins da Lei Geral de Proteção de Dados Pessoais (LGPD), Caroline Bispo atua como controladora dos dados pessoais tratados diretamente nesses serviços.</p>
                         <div class="legal-contact-card">
                             <strong>Canal de privacidade</strong>
-                            <p>E-mail: <a href="mailto:atendimento.carolinebispo@gmail.com">atendimento.carolinebispo@gmail.com</a><br>WhatsApp: <a href="https://wa.me/5511980569539" target="_blank" rel="noopener noreferrer">(11) 98056-9539</a><br>Localidade de referência: Franco da Rocha, SP, Brasil.</p>
+                            <p>E-mail: <a href="mailto:{{ site.contact.email }}">{{ site.contact.email }}</a><br>WhatsApp: <a href="{{ site.links.whatsappBase }}" target="_blank" rel="noopener noreferrer">{{ site.contact.phoneDisplay }}</a><br>Localidade de referência: Franco da Rocha, SP, Brasil.</p>
                         </div>
                     </section>
 
@@ -168,44 +138,8 @@
                     <section class="legal-section" id="contato">
                         <h2>11. Atualizações e contato</h2>
                         <p>Esta política poderá ser atualizada para refletir mudanças nos serviços, fornecedores ou regras aplicáveis. A versão vigente será sempre publicada nesta página, com a data da última atualização.</p>
-                        <p>Para dúvidas, solicitações de privacidade ou exercício de direitos, envie um e-mail para <a href="mailto:atendimento.carolinebispo@gmail.com">atendimento.carolinebispo@gmail.com</a> ou uma mensagem para <a href="https://wa.me/5511980569539" target="_blank" rel="noopener noreferrer">(11) 98056-9539</a>.</p>
+                        <p>Para dúvidas, solicitações de privacidade ou exercício de direitos, envie um e-mail para <a href="mailto:{{ site.contact.email }}">{{ site.contact.email }}</a> ou uma mensagem para <a href="{{ site.links.whatsappBase }}" target="_blank" rel="noopener noreferrer">{{ site.contact.phoneDisplay }}</a>.</p>
                     </section>
                 </article>
             </div>
         </section>
-    </main>
-
-    <footer class="site-footer">
-        <div class="container footer-grid">
-            <div>
-                <a class="brand brand-footer" href="/" aria-label="Caroline Bispo — página inicial">
-                    <img class="brand-logo brand-logo-footer" src="/images/logo-caroline-bispo-localizacao.png" alt="Caroline Bispo" width="1200" height="393" loading="lazy">
-                </a>
-                <p>Otimização do Perfil da Empresa no Google para negócios locais.</p>
-            </div>
-            <div>
-                <h2>Contato</h2>
-                <a href="mailto:atendimento.carolinebispo@gmail.com">E-mail</a>
-                <a href="tel:+5511980569539">(11) 98056-9539</a>
-            </div>
-            <div>
-                <h2>Redes</h2>
-                <a href="https://www.instagram.com/acahdomarketing/" target="_blank" rel="noopener noreferrer">Instagram</a>
-                <a href="https://www.facebook.com/people/Caroline-Bispo-l-Especialista-em-Marketing-Digital/61588458444555/" target="_blank" rel="noopener noreferrer">Facebook</a>
-            </div>
-            <div class="footer-legal-links">
-                <h2>Informações legais</h2>
-                <a href="/politica-de-privacidade.html" aria-current="page">Política de Privacidade</a>
-                <a href="/termos-de-servico.html">Termos de Serviço</a>
-                <a href="/exclusao-de-dados.html">Exclusão de Dados</a>
-            </div>
-        </div>
-        <div class="container footer-bottom">
-            <span>&copy; <span id="current-year">2026</span> Caroline Bispo. Todos os direitos reservados.</span>
-            <span>Franco da Rocha • SP</span>
-        </div>
-    </footer>
-
-    <script src="/script.js" defer></script>
-</body>
-</html>

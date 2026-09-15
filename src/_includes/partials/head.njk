@@ -1,0 +1,44 @@
+{% set pageInfo = pages.entries[pageKey] %}
+{% set metaTitle = pageInfo.title or title %}
+{% set metaDescription = pageInfo.description or description %}
+{% set canonicalUrl = site.url + (pageInfo.url or canonicalPath) %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>{{ metaTitle }}</title>
+    <meta name="description" content="{{ metaDescription }}">
+    <meta name="author" content="{{ site.name }}">
+    <meta name="robots" content="{{ robots }}">
+    <meta name="theme-color" content="{{ site.themeColor }}">
+    <link rel="canonical" href="{{ canonicalUrl }}">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+{% if isIndexable %}    <link rel="manifest" href="/site.webmanifest">
+    <link rel="describedby" href="/llms.txt">
+
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="{{ site.locale }}">
+    <meta property="og:site_name" content="{{ site.name }}">
+    <meta property="og:url" content="{{ canonicalUrl }}">
+    <meta property="og:title" content="{{ metaTitle }}">
+    <meta property="og:description" content="{{ metaDescription }}">
+    <meta property="og:image" content="{{ site.url }}{{ site.homeSeo.image }}">
+    <meta property="og:image:secure_url" content="{{ site.url }}{{ site.homeSeo.image }}">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="{{ site.homeSeo.imageWidth }}">
+    <meta property="og:image:height" content="{{ site.homeSeo.imageHeight }}">
+    <meta property="og:image:alt" content="{{ site.homeSeo.imageAlt }}">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ metaTitle }}">
+    <meta name="twitter:description" content="{{ metaDescription }}">
+    <meta name="twitter:image" content="{{ site.url }}{{ site.homeSeo.image }}">
+    <meta name="twitter:image:alt" content="{{ site.homeSeo.imageAlt }}">
+{% endif %}
+    <link rel="stylesheet" href="/style.css">
+{% if isLegal %}    <link rel="stylesheet" href="/legal.css">
+{% endif %}
+{% if isIndexable %}
+{% include "partials/schema.njk" %}
+{% endif %}

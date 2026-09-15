@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="{{ site.language }}">
+<head>
+{% include "partials/head.njk" %}
+</head>
+<body{% if bodyClass %} class="{{ bodyClass }}"{% endif %}>
+    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+{% include "partials/header.njk" %}
+
+    <main id="conteudo">
+{{ content | safe }}
+    </main>
+
+{% include "partials/footer.njk" %}
+{% if isIndexable %}
+{% include "partials/mobile-actions.njk" %}
+{% include "partials/cookie-consent.njk" %}
+{% endif %}
+
+    <script src="/script.js" defer></script>
+</body>
+</html>

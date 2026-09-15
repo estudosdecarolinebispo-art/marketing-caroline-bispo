@@ -1,0 +1,23 @@
+{
+  "name": "carolinebispo-site",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.19.0",
+  "engines": {
+    "node": ">=24.8.0"
+  },
+  "scripts": {
+    "dev": "eleventy --serve --port=4173",
+    "build": "eleventy",
+    "validate:html": "html-validate \"_site/**/*.html\"",
+    "validate:site": "node scripts/validate-build.mjs",
+    "validate:production": "node scripts/validate-production.mjs",
+    "validate": "pnpm run validate:html && pnpm run validate:site",
+    "verify": "pnpm run build && pnpm run validate"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "3.1.6",
+    "html-validate": "11.15.0"
+  }
+}

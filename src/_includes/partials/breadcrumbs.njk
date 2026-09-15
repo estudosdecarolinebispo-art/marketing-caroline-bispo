@@ -1,0 +1,7 @@
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <ol>
+                <li><a href="/">Home</a></li>
+{% if breadcrumbParentUrl %}                <li><a href="{{ breadcrumbParentUrl }}">{{ breadcrumbParentLabel }}</a></li>
+{% endif %}                <li aria-current="page">{{ breadcrumbLabel }}</li>
+            </ol>
+        </nav>

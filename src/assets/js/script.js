@@ -8,6 +8,8 @@
 
     var META_PIXEL_ID = "2429202777490521";
     var COOKIE_CONSENT_KEY = "caroline_meta_consent_v1";
+    var CAL_EMBED_SCRIPT = "https://app.cal.com/embed/embed.js";
+    var CAL_PUBLIC_URL = "https://cal.com/caroline-bispo/agendamentos";
 
     function getCookieConsent() {
         try {
@@ -63,6 +65,136 @@
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push(eventData);
         window.dispatchEvent(new CustomEvent("caroline:conversion", { detail: eventData }));
+    }
+
+    function showCalFallback(calendar) {
+        if (!calendar || calendar.dataset.fallbackShown === "true") return;
+
+        calendar.dataset.fallbackShown = "true";
+        calendar.setAttribute("aria-busy", "false");
+
+        var message = document.createElement("p");
+        var link = document.createElement("a");
+        message.className = "cal-fallback";
+        message.append("Não foi possível carregar a agenda aqui. ");
+        link.href = CAL_PUBLIC_URL + window.location.search;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = "Abra a agenda em uma nova aba.";
+        message.appendChild(link);
+        calendar.replaceChildren(message);
+    }
+
+    function initializeCalEmbed(calendar) {
+        if (!calendar || calendar.dataset.calInitialized === "true") return;
+
+        calendar.dataset.calInitialized = "true";
+
+        (function (C, A, L) {
+            var push = function (api, args) { api.q.push(args); };
+            var documentRef = C.document;
+
+            C.Cal = C.Cal || function () {
+                var cal = C.Cal;
+                var args = arguments;
+
+                if (!cal.loaded) {
+                    cal.ns = {};
+                    cal.q = cal.q || [];
+
+                    var script = documentRef.createElement("script");
+                    script.src = A;
+                    script.async = true;
+                    script.addEventListener("error", function () {
+                        showCalFallback(calendar);
+                    }, { once: true });
+                    documentRef.head.appendChild(script);
+                    cal.loaded = true;
+                }
+
+                if (args[0] === L) {
+                    var api = function () { push(api, arguments); };
+                    var namespace = args[1];
+                    api.q = api.q || [];
+
+                    if (typeof namespace === "string") {
+                        cal.ns[namespace] = cal.ns[namespace] || api;
+                        push(cal.ns[namespace], args);
+                        push(cal, ["initNamespace", namespace]);
+                    } else {
+                        push(cal, args);
+                    }
+                    return;
+                }
+
+                push(cal, args);
+            };
+        })(window, CAL_EMBED_SCRIPT, "init");
+
+        window.Cal("init", "agendamentos", { origin: "https://app.cal.com" });
+        window.Cal.config = window.Cal.config || {};
+        window.Cal.config.forwardQueryParams = true;
+        window.Cal.ns.agendamentos("inline", {
+            elementOrSelector: "#my-cal-inline-agendamentos",
+            config: { layout: "month_view", useSlotsViewOnSmallScreen: true },
+            calLink: "caroline-bispo/agendamentos"
+        });
+        window.Cal.ns.agendamentos("ui", {
+            cssVarsPerTheme: { light: { "cal-brand": "#101a69" } },
+            hideEventTypeDetails: true,
+            layout: "month_view"
+        });
+        window.Cal.ns.agendamentos("on", {
+            action: "bookingSuccessfulV2",
+            callback: function (event) {
+                var bookingData = event && event.detail ? event.detail.data : {};
+
+                trackConversion("schedule_complete", {
+                    click_location: "cal_embed",
+                    destination: "caroline-bispo/agendamentos",
+                    booking_status: bookingData.status || "created"
+                });
+                trackMetaEvent("Schedule", {
+                    content_name: "analise_perfil_google"
+                });
+            }
+        });
+
+        var loadTimeout = window.setTimeout(function () {
+            if (calendar.querySelector("iframe")) {
+                calendar.setAttribute("aria-busy", "false");
+            } else {
+                showCalFallback(calendar);
+            }
+        }, 15000);
+
+        if ("MutationObserver" in window) {
+            var renderObserver = new MutationObserver(function () {
+                if (!calendar.querySelector("iframe")) return;
+                window.clearTimeout(loadTimeout);
+                calendar.setAttribute("aria-busy", "false");
+                renderObserver.disconnect();
+            });
+            renderObserver.observe(calendar, { childList: true, subtree: true });
+        }
+    }
+
+    function setupCalEmbed() {
+        var calendar = document.getElementById("my-cal-inline-agendamentos");
+        if (!calendar) return;
+
+        var initialize = function () { initializeCalEmbed(calendar); };
+
+        if ("IntersectionObserver" in window) {
+            var loadObserver = new IntersectionObserver(function (entries) {
+                if (!entries.some(function (entry) { return entry.isIntersecting; })) return;
+                loadObserver.disconnect();
+                initialize();
+            }, { rootMargin: "600px 0px" });
+            loadObserver.observe(calendar);
+        } else {
+            window.addEventListener("load", initialize, { once: true });
+        }
     }
 
     function fillCampaignFields(form) {
@@ -122,16 +254,8 @@
                 body: new FormData(form),
                 mode: "no-cors"
             }).then(function () {
-                trackConversion("lead_submit", {
-                    click_location: "lead_form",
-                    destination: "google_sheets"
-                });
-                trackMetaEvent("Lead", { content_name: "analise_perfil_google" });
-
-                form.reset();
-                fillCampaignFields(form);
-                status.textContent = "Recebemos suas informações! Caroline entrará em contato pelo WhatsApp.";
-                status.className = "form-status is-visible is-success";
+                status.textContent = "A solicitação foi encaminhada, mas a integração atual não confirma o registro na planilha. Não reenvie agora; se precisar confirmar o recebimento, fale pelo WhatsApp.";
+                status.className = "form-status is-visible is-warning";
             }).catch(function () {
                 status.textContent = "Não foi possível enviar agora. Tente novamente ou fale pelo WhatsApp.";
                 status.className = "form-status is-visible is-error";
@@ -182,6 +306,7 @@
 
         setupCookieConsent();
         setupLeadForm();
+        setupCalEmbed();
 
         if (year) {
             year.textContent = String(new Date().getFullYear());
@@ -260,22 +385,5 @@
             calendarObserver.observe(calendar);
         }
 
-        if (window.Cal && window.Cal.ns && window.Cal.ns.agendamentos) {
-            window.Cal.ns.agendamentos("on", {
-                action: "bookingSuccessfulV2",
-                callback: function (event) {
-                    var bookingData = event && event.detail ? event.detail.data : {};
-
-                    trackConversion("schedule_complete", {
-                        click_location: "cal_embed",
-                        destination: "caroline-bispo/agendamentos",
-                        booking_status: bookingData.status || "created"
-                    });
-                    trackMetaEvent("Schedule", {
-                        content_name: "analise_perfil_google"
-                    });
-                }
-            });
-        }
     });
 })();

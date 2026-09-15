@@ -1,0 +1,124 @@
+        <section class="hero institutional-hero" id="inicio">
+            <div class="hero-glow hero-glow-one" aria-hidden="true"></div>
+            <div class="hero-glow hero-glow-two" aria-hidden="true"></div>
+            <div class="container hero-grid institutional-hero-grid">
+                <div class="hero-copy">
+                    <p class="eyebrow">Caroline Bispo • Marketing Digital para Negócios Locais</p>
+                    <h1>{{ pages.entries.home.h1 }}</h1>
+                    <p class="hero-lead">Estratégias que conectam presença no Google, descoberta local, campanhas e atendimento para transformar canais digitais em uma jornada mais clara para o cliente.</p>
+                    <div class="hero-actions">
+                        <a class="button button-primary button-large" href="/servicos/" data-track="services_click" data-location="home_hero">Conhecer os serviços</a>
+                        <a class="button button-secondary" href="/diagnostico-google-meu-negocio/" data-track="diagnostic_click" data-location="home_hero">Solicitar diagnóstico gratuito</a>
+                    </div>
+                    <p class="microcopy">Estratégia local • comunicação clara • decisões sem promessas vazias</p>
+                </div>
+                <aside class="strategy-panel" aria-label="Quatro pilares do trabalho">
+                    <p class="card-label">Estratégia conectada</p>
+                    <h2>Da descoberta ao atendimento</h2>
+                    <ol>
+{% for key in services.order %}                        <li><a href="{{ services.items[key].url }}"><span>{{ services.items[key].number }}</span>{{ services.items[key].shortName }}</a></li>
+{% endfor %}                    </ol>
+                </aside>
+            </div>
+        </section>
+
+        <section class="trust-strip" aria-label="Como os serviços se conectam">
+            <div class="container trust-grid">
+                <div><strong>Ser encontrado</strong><span>presença orgânica e Google Maps</span></div>
+                <div><strong>Gerar oportunidades</strong><span>mídia orientada a objetivos comerciais</span></div>
+                <div><strong>Atender melhor</strong><span>triagem, contexto e continuidade</span></div>
+            </div>
+        </section>
+
+        <section class="section intro-section">
+            <div class="container split-heading">
+                <div>
+                    <p class="eyebrow eyebrow-dark">Marketing local com direção</p>
+                    <h2>O cliente pode conhecer seu negócio em vários pontos. A estratégia precisa ligar esses pontos.</h2>
+                </div>
+                <div class="section-prose">
+                    <p>Uma busca no Google, um anúncio ou uma conversa no WhatsApp não funcionam de forma isolada. Informações inconsistentes, campanhas sem destino claro e atendimento desorganizado criam atrito justamente quando alguém demonstra interesse.</p>
+                    <p>O trabalho começa entendendo o momento do negócio e escolhendo a frente que merece prioridade — sem empilhar ferramentas ou criar uma solução maior do que o necessário.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section services-section" id="servicos">
+            <div class="container section-heading-row">
+                <div>
+                    <p class="eyebrow eyebrow-dark">Serviços principais</p>
+                    <h2>Quatro pilares, uma jornada mais coerente.</h2>
+                </div>
+                <a class="text-link" href="/servicos/">Comparar todos os serviços <span aria-hidden="true">→</span></a>
+            </div>
+            <div class="container service-card-grid">
+{% for key in services.order %}{% set service = services.items[key] %}                <article class="service-card">
+                    <span class="service-number">{{ service.number }}</span>
+                    <p class="card-label">{{ service.eyebrow }}</p>
+                    <h3><a href="{{ service.url }}">{{ service.name }}</a></h3>
+                    <p>{{ service.lead }}</p>
+                    <a class="text-link" href="{{ service.url }}">Entender este serviço <span aria-hidden="true">→</span></a>
+                </article>
+{% endfor %}            </div>
+        </section>
+
+        <section class="section focus-section">
+            <div class="container focus-grid">
+                <div>
+                    <p class="eyebrow">Especialização em presença local</p>
+                    <h2>O Google é um ponto decisivo para muitos negócios locais.</h2>
+                    <p>O Perfil da Empresa organiza a apresentação na Busca e no Maps. O SEO Local amplia essa visão para o site, o conteúdo, as avaliações e outros sinais que ajudam pessoas próximas a compreender e considerar o negócio.</p>
+                    <div class="inline-links">
+                        <a href="/servicos/perfil-da-empresa-no-google/">Perfil da Empresa no Google</a>
+                        <a href="/servicos/seo-local-google-maps/">SEO Local e Google Maps</a>
+                    </div>
+                </div>
+                <div class="focus-points">
+                    <p><strong>Informação</strong><span>Dados claros e coerentes sobre o negócio.</span></p>
+                    <p><strong>Relevância</strong><span>Conteúdo alinhado ao que o público procura.</span></p>
+                    <p><strong>Confiança</strong><span>Experiência digital que ajuda a escolher e entrar em contato.</span></p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section about-section home-about-section">
+            <div class="container about-grid">
+                <div class="portrait-wrap">
+                    <div class="portrait-accent" aria-hidden="true"></div>
+                    {% include "components/profile-picture.njk" %}
+                    <p><strong>Caroline Bispo</strong><span>Marketing Digital para Negócios Locais</span></p>
+                </div>
+                <div class="about-copy">
+                    <p class="eyebrow eyebrow-dark">Quem conduz a estratégia</p>
+                    <h2>Uma visão próxima do negócio, traduzida em prioridades práticas.</h2>
+                    <p>Caroline Bispo atua com estratégias digitais voltadas a negócios locais. O trabalho reúne presença no Google, SEO Local, tráfego pago e automação de atendimento de acordo com o cenário e a necessidade de cada operação.</p>
+                    <p>A abordagem valoriza explicações claras, dados confirmados e escolhas possíveis de executar — sem prometer posições, vendas ou resultados garantidos.</p>
+                    <a class="text-link" href="/sobre/">Conhecer a forma de trabalho <span aria-hidden="true">→</span></a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section diagnostic-callout">
+            <div class="container diagnostic-callout-inner">
+                <div>
+                    <p class="eyebrow">Oferta de entrada</p>
+                    <h2>Não sabe por onde começar? Comece pelo seu Perfil da Empresa no Google.</h2>
+                    <p>O diagnóstico gratuito reúne uma conversa de 30 minutos e um relatório em PDF com os pontos observados e as prioridades iniciais.</p>
+                </div>
+                <a class="button button-primary button-large" href="/diagnostico-google-meu-negocio/" data-track="diagnostic_click" data-location="home_diagnostic">Ver o diagnóstico gratuito</a>
+            </div>
+        </section>
+
+        <section class="final-cta institutional-final-cta">
+            <div class="container final-cta-inner">
+                <div>
+                    <p class="eyebrow">Conversa direta</p>
+                    <h2>Conte em que ponto seu negócio está.</h2>
+                    <p>Fale pelo WhatsApp, envie um e-mail ou escolha um horário para uma conversa.</p>
+                </div>
+                <div class="cta-group">
+                    <a class="button button-whatsapp button-large" href="{{ site.links.whatsapp }}" target="_blank" rel="noopener noreferrer" data-track="whatsapp_click" data-location="home_final">Falar no WhatsApp</a>
+                    <a class="button button-secondary" href="/contato/">Contato e agendamento</a>
+                </div>
+            </div>
+        </section>

@@ -1,0 +1,10 @@
+    <nav class="mobile-actions" aria-label="Ações rápidas">
+        <a href="{{ mobilePrimaryUrl or '/diagnostico-google-meu-negocio/' }}" data-track="{{ mobilePrimaryTrack or 'diagnostic_click' }}" data-location="mobile_bar">{{ mobilePrimaryLabel or 'Diagnóstico' }}</a>
+        <a
+            href="{{ site.links.whatsapp }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-track="whatsapp_click"
+            data-location="mobile_bar"
+        >WhatsApp</a>
+    </nav>

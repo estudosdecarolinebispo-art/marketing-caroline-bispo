@@ -1,0 +1,51 @@
+        <section class="page-hero">
+            <div class="hero-glow hero-glow-one" aria-hidden="true"></div>
+            <div class="container">
+                {% include "partials/breadcrumbs.njk" %}
+                <div class="page-hero-grid">
+                    <div>
+                        <p class="eyebrow">Serviços</p>
+                        <h1>{{ pages.entries.services.h1 }}</h1>
+                        <p class="page-hero-lead">A escolha não começa pela ferramenta. Começa pelo ponto que hoje limita a descoberta, a geração de oportunidades ou a continuidade do atendimento.</p>
+                    </div>
+                    <div class="page-summary">
+                        <span>Como escolher</span>
+                        <p>Compare o papel de cada serviço e siga para a página que corresponde ao seu momento.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section services-section">
+            <h2 class="visually-hidden">Serviços de marketing digital disponíveis</h2>
+            <div class="container service-card-grid service-hub-grid">
+{% for key in services.order %}{% set service = services.items[key] %}                <article class="service-card service-card-detailed">
+                    <span class="service-number">{{ service.number }}</span>
+                    <p class="card-label">{{ service.eyebrow }}</p>
+                    <h2><a href="{{ service.url }}">{{ service.name }}</a></h2>
+                    <p>{{ service.definition }}</p>
+                    <div class="service-fit"><strong>Faz sentido quando</strong><span>{{ service.audience[0] }}</span></div>
+                    <a class="text-link" href="{{ service.url }}">Ver escopo e processo <span aria-hidden="true">→</span></a>
+                </article>
+{% endfor %}            </div>
+        </section>
+
+        <section class="section journey-section">
+            <div class="container split-heading">
+                <div><p class="eyebrow eyebrow-dark">Relação entre os pilares</p><h2>Nem todo negócio precisa começar pelo mesmo lugar.</h2></div>
+                <p>Um perfil desorganizado pode pedir correções antes de uma campanha. Uma campanha pode aumentar contatos e revelar a necessidade de triagem. O papel da estratégia é escolher a sequência com mais coerência.</p>
+            </div>
+            <div class="container journey-flow">
+                <div><span>1</span><strong>Apresentar</strong><p>Perfil da Empresa no Google</p></div>
+                <div><span>2</span><strong>Ser encontrado</strong><p>SEO Local e Google Maps</p></div>
+                <div><span>3</span><strong>Gerar oportunidades</strong><p>Gestão de Tráfego Pago</p></div>
+                <div><span>4</span><strong>Organizar respostas</strong><p>Automação para WhatsApp</p></div>
+            </div>
+        </section>
+
+        <section class="section diagnostic-callout light-callout">
+            <div class="container diagnostic-callout-inner">
+                <div><p class="eyebrow eyebrow-dark">Ponto de partida</p><h2>O diagnóstico gratuito é específico para o Perfil da Empresa no Google.</h2><p>Ele ajuda a identificar problemas iniciais. Para outros cenários, use a página de contato e explique sua necessidade.</p></div>
+                <div class="cta-group"><a class="button button-primary" href="/diagnostico-google-meu-negocio/">Ver diagnóstico</a><a class="button button-outline" href="/contato/">Falar sobre outro serviço</a></div>
+            </div>
+        </section>

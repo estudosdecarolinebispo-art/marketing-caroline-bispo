@@ -1,0 +1,13 @@
+{
+  "primary": [
+    { "key": "services", "label": "Serviços", "url": "/servicos/" },
+    { "key": "about", "label": "Sobre", "url": "/sobre/" },
+    { "key": "diagnostic", "label": "Diagnóstico", "url": "/diagnostico-google-meu-negocio/" },
+    { "key": "contact", "label": "Contato", "url": "/contato/" }
+  ],
+  "legal": [
+    { "key": "privacy", "label": "Política de Privacidade", "url": "/politica-de-privacidade.html" },
+    { "key": "terms", "label": "Termos de Serviço", "url": "/termos-de-servico.html" },
+    { "key": "deletion", "label": "Exclusão de Dados", "url": "/exclusao-de-dados.html" }
+  ]
+}

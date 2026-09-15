@@ -1,0 +1,62 @@
+{% if isLegal %}    <footer class="site-footer">
+        <div class="container footer-grid">
+            <div>
+                <a class="brand brand-footer" href="/" aria-label="{{ site.name }} — página inicial">
+                    <img class="brand-logo brand-logo-footer" src="/{{ site.brand.logo }}" alt="{{ site.name }}" width="{{ site.brand.logoWidth }}" height="{{ site.brand.logoHeight }}" loading="lazy">
+                </a>
+                <p>{{ site.description }}</p>
+            </div>
+            <div>
+                <h2>Contato</h2>
+                <a href="mailto:{{ site.contact.email }}">E-mail</a>
+                <a href="tel:{{ site.contact.phoneE164 }}">{{ site.contact.phoneDisplay }}</a>
+            </div>
+            <div>
+                <h2>Redes</h2>
+                <a href="{{ site.links.instagram }}" target="_blank" rel="noopener noreferrer">Instagram</a>
+                <a href="{{ site.links.facebook }}" target="_blank" rel="noopener noreferrer">Facebook</a>
+            </div>
+            <div class="footer-legal-links">
+                <h2>Informações legais</h2>
+{% for item in navigation.legal %}                <a href="{{ item.url }}"{% if pageKey == item.key %} aria-current="page"{% endif %}>{{ item.label }}</a>
+{% endfor %}            </div>
+        </div>
+        <div class="container footer-bottom">
+            <span>&copy; <span id="current-year">2026</span> {{ site.name }}. Todos os direitos reservados.</span>
+            <span>{{ site.location }}</span>
+        </div>
+    </footer>
+{% else %}    <footer class="site-footer">
+        <div class="container footer-grid footer-grid-institutional">
+            <div>
+                <a class="brand brand-footer" href="#topo" aria-label="{{ site.name }} — voltar ao topo">
+                    <img class="brand-logo brand-logo-footer" src="/{{ site.brand.logo }}" alt="{{ site.name }}" width="{{ site.brand.logoWidth }}" height="{{ site.brand.logoHeight }}" loading="lazy">
+                </a>
+                <p>{{ site.description }}</p>
+            </div>
+            <div>
+                <h2>Navegação</h2>
+                <a href="/servicos/">Serviços</a>
+                <a href="/sobre/">Sobre</a>
+                <a href="/diagnostico-google-meu-negocio/">Diagnóstico gratuito</a>
+                <a href="/contato/">Contato</a>
+            </div>
+            <div>
+                <h2>Contato e redes</h2>
+                <a href="mailto:{{ site.contact.email }}">{{ site.contact.email }}</a>
+                <a href="tel:{{ site.contact.phoneE164 }}">{{ site.contact.phoneDisplay }}</a>
+                <a href="{{ site.links.instagram }}" target="_blank" rel="noopener noreferrer">Instagram</a>
+                <a href="{{ site.links.facebook }}" target="_blank" rel="noopener noreferrer">Facebook</a>
+                <a href="{{ site.links.googleReview }}" target="_blank" rel="noopener noreferrer">Avalie no Google</a>
+            </div>
+            <div class="footer-legal-links">
+                <h2>Informações legais</h2>
+{% for item in navigation.legal %}                <a href="{{ item.url }}">{{ item.label }}</a>
+{% endfor %}            </div>
+        </div>
+        <div class="container footer-bottom">
+            <span>&copy; <span id="current-year">2026</span> {{ site.name }}. Todos os direitos reservados.</span>
+            <span class="footer-meta"><button class="cookie-preferences" id="cookie-preferences" type="button">Preferências de cookies</button><span aria-hidden="true">•</span> {{ site.location }}</span>
+        </div>
+    </footer>
+{% endif %}
