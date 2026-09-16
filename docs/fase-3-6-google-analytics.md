@@ -1,6 +1,6 @@
 # Fase 3.6 — Integração do Google Analytics 4
 
-Data da implementação e validação local: 16 de setembro de 2026, horário de Brasília.
+Data da implementação, publicação e validação: 16 de setembro de 2026, horário de Brasília.
 
 Origem canônica: `https://www.carolinebispo.com.br/`
 
@@ -8,9 +8,9 @@ ID de medição: `G-N5H2J8S9GL`
 
 ## Escopo e estado da entrega
 
-O Google Analytics 4 foi integrado localmente à arquitetura Eleventy existente, com configuração centralizada e consentimento básico por finalidade. A tag do Google não é carregada e nenhuma requisição do GA4 é enviada antes de uma autorização explícita para **Analytics**.
+O Google Analytics 4 foi integrado à arquitetura Eleventy existente, com configuração centralizada e consentimento básico por finalidade. A tag do Google não é carregada e nenhuma requisição do GA4 é enviada antes de uma autorização explícita para **Analytics**.
 
-A implementação está apenas no diretório de trabalho. Não houve commit, push ou deploy. DNS, Search Console, Apps Script, backend, arquitetura editorial, páginas de serviço, textos comerciais, Schema.org, sitemap, `llms.txt` e identidade visual não foram alterados. Google Tag Manager não foi instalado e a Fase 4 não foi iniciada.
+A implementação foi publicada de forma controlada no domínio canônico e validada em produção. DNS, Search Console, Apps Script, backend, arquitetura editorial, páginas de serviço, textos comerciais, Schema.org, sitemap, `llms.txt` e identidade visual não foram alterados. Google Tag Manager não foi instalado e a Fase 4 não foi iniciada.
 
 ## Diagnóstico anterior à implementação
 
@@ -161,21 +161,118 @@ O Tag Assistant oficial foi conectado ao site local e encontrou **uma** Google t
 
 O detalhe também exibiu `GT-55B9QDSB`, o identificador da Google tag associada ao mesmo destino do GA4. O próprio Tag Assistant contou uma única tag encontrada; não há um segundo snippet instalado no projeto.
 
-## O que ainda depende da publicação
+## Publicação controlada
 
-A tela oficial do fluxo do GA4 ainda informava “Nenhum dado foi recebido nas últimas 48 horas” durante esta validação. Isso é esperado porque o código não foi publicado e não autoriza declarar coleta em produção. O Tag Assistant comprovou o carregamento e o `page_view` local, mas o relatório de Tempo real e o DebugView da propriedade não foram usados como prova de produção.
+### Commit, push e workflow
 
-Depois de um deploy autorizado:
+- commit de implementação: `3ba17e82b05bc1abf47ee4b2bbe79305133ffa18` — `Integra Google Analytics 4 com consentimento`;
+- destino do push: `origin/main` no repositório `estudosdecarolinebispo-art/marketing-caroline-bispo`;
+- workflow: [Build and deploy Eleventy to GitHub Pages — execução 35105404679](https://github.com/estudosdecarolinebispo-art/marketing-caroline-bispo/actions/runs/35105404679);
+- job `build`: concluído com sucesso;
+- job `deploy`: concluído com sucesso;
+- commit implantado pelo workflow: `3ba17e82b05bc1abf47ee4b2bbe79305133ffa18`.
 
-1. abrir `https://www.carolinebispo.com.br/` em uma sessão limpa;
-2. antes da escolha, confirmar no Tag Assistant que a Google tag não foi carregada;
-3. aceitar somente Analytics;
-4. confirmar uma única tag `G-N5H2J8S9GL`, um único `page_view` e ausência da Meta;
-5. no GA4, abrir **Relatórios → Tempo real** e confirmar a visita, a página e a origem;
-6. para DebugView, iniciar uma sessão do Tag Assistant no domínio publicado e abrir **Administrador → Exibição de dados → DebugView**;
-7. repetir com uma URL de teste que use UTMs não pessoais e confirmar origem, mídia e campanha;
-8. recusar/revogar Analytics e confirmar que novos carregamentos não produzem requisições;
-9. verificar as nove páginas e registrar horário, rota e resultado observado.
+Antes do commit, `pnpm run verify`, o build Eleventy, a revisão do diff, `git diff --check` e a busca por padrões de credenciais foram aprovados. Nenhuma credencial foi encontrada. O arquivo `docs/fase-3-5-publicacao-validacao.md`, já modificado antes da Fase 3.6, foi preservado localmente e excluído do commit.
+
+### Domínio e artefato publicado
+
+- as nove páginas indexáveis responderam HTTP 200 em HTTPS;
+- o HTML da home contém uma referência inerte a `G-N5H2J8S9GL` e nenhum carregador estático do Google;
+- `script.js` contém o loader oficial, a preferência versionada e nenhuma ocorrência de `generate_lead` ou ID `GTM-...`;
+- `/CNAME` continua servindo `www.carolinebispo.com.br`;
+- o CNAME consultado no resolvedor público `1.1.1.1` continua apontando para `estudosdecarolinebispo-art.github.io`, com TTL de 3.600 segundos.
+
+Nenhuma alteração foi feita no DNS ou nas configurações do Search Console.
+
+## Validação em produção
+
+### Consentimento
+
+Em uma sessão limpa:
+
+- o painel apareceu antes de qualquer escolha;
+- havia zero recurso do Google Analytics e zero recurso do Pixel da Meta;
+- **Recusar opcionais** manteve as duas integrações ausentes;
+- somente Analytics carregou um `gtag.js`, enviou um `page_view` e não carregou a Meta;
+- somente Marketing carregou um `fbevents.js` e um `PageView` da Meta, sem recurso do GA4;
+- aceitar todas carregou um loader principal de cada integração e um `PageView` de cada fornecedor;
+- reabrir o painel mostrou as escolhas corretas;
+- recarregar preservou as escolhas;
+- revogar Analytics ou Marketing recarregou a página e removeu os recursos da categoria revogada.
+
+A lógica publicada preserva a migração conservadora: `accepted` legado mantém somente Marketing e deixa Analytics indefinido; `rejected` mantém ambas recusadas. O perfil antigo disponível no Chrome já continha uma escolha atual com ambas autorizadas, portanto o armazenamento não foi adulterado para fabricar um estado legado em produção.
+
+### Nove páginas e parâmetros
+
+Cada uma das nove páginas indexáveis carregou exatamente um `gtag.js` e enviou exatamente um `page_view` com título e `document_location` correspondentes:
+
+| Rota | `page_view` | Duplicação |
+|---|---:|---:|
+| `/` | 1 | não |
+| `/sobre/` | 1 | não |
+| `/servicos/` | 1 | não |
+| `/servicos/perfil-da-empresa-no-google/` | 1 | não |
+| `/servicos/seo-local-google-maps/` | 1 | não |
+| `/servicos/gestao-trafego-pago/` | 1 | não |
+| `/servicos/automacao-atendimento-whatsapp/` | 1 | não |
+| `/diagnostico-google-meu-negocio/` | 1 | não |
+| `/contato/` | 1 | não |
+
+A URL de teste usou somente valores não pessoais: `utm_source=codex_validation`, `utm_medium=qa` e `utm_campaign=fase_3_6_producao`. Os três valores permaneceram no `document_location` enviado ao GA4. O pedido também continha título, resolução e plataforma; não foram encontrados parâmetros com chaves de nome, e-mail, telefone, WhatsApp, formulário ou lead. A atribuição final de origem, mídia e campanha nos relatórios padrão ainda depende do processamento do GA4.
+
+### Google Tag Assistant
+
+O Tag Assistant oficial foi conectado ao domínio publicado com uma campanha de teste não pessoal. O resultado foi:
+
+- uma Google tag encontrada;
+- ID de destino `G-N5H2J8S9GL`;
+- origem `gtag('config') na página`;
+- um `page_view` por carregamento observado;
+- `analytics_storage` alterado de negado para concedido;
+- `ad_storage`, `ad_user_data` e `ad_personalization` mantidos negados;
+- `Console (0)`;
+- `GT-55B9QDSB` exibido como ID da mesma Google tag, não como segunda instalação.
+
+A sessão exibiu dois `page_view` no total porque houve dois carregamentos separados — conexão inicial e recarga controlada —, com um evento em cada carregamento.
+
+### Propriedade oficial do GA4
+
+As evidências foram separadas por estágio:
+
+| Estágio | Evidência |
+|---|---|
+| Tag instalada | Tag Assistant encontrou uma tag com destino `G-N5H2J8S9GL`. |
+| Requisição enviada | Inventário de rede observou `g/collect` com `en=page_view` e o ID correto. |
+| Evento recebido pela propriedade | O fluxo oficial mudou para “Recebendo tráfego nas últimas 48 horas”. |
+| Sinal em relatório | A página inicial do GA4 mostrou 1 usuário ativo nos últimos 30 minutos, no Brasil. |
+
+O relatório detalhado **Relatórios → Tempo real** e o DebugView não foram usados como evidência adicional. O GA4 apresentou antes da navegação um modal obrigatório de preferências de comunicações por e-mail, com quatro opções desmarcadas. Salvar ou alterar essas preferências depende da proprietária e não foi feito silenciosamente. O card de tempo real e o estado do fluxo já comprovam recebimento pela propriedade, mas páginas, eventos e campanha no relatório detalhado continuam pendentes de inspeção.
+
+### Cal.com
+
+Em produção:
+
+- antes de aproximar a agenda do viewport: zero script e zero iframe;
+- depois do acionamento sob demanda: um `embed.js` e um iframe;
+- `aria-busy` terminou em `false`;
+- o iframe exibiu mês, datas disponíveis e horários no desktop;
+- os parâmetros `utm_source=codex_validation`, `utm_medium=qa` e `utm_campaign=fase_3_6_cal` foram preservados no iframe;
+- em viewport de 390 × 844, a área útil ficou em 375 px, sem overflow horizontal; o iframe ficou dentro da largura e exibiu os controles do mês e as datas;
+- nenhum agendamento foi criado;
+- não houve erro ou aviso no console.
+
+O estado `Loading` observado localmente não se repetiu em produção e não exigiu correção de código.
+
+### Formulário
+
+O destino Apps Script, o método `POST` e os cinco campos obrigatórios permaneceram inalterados. Um clique com os campos vazios focou `nome`, manteve cinco controles inválidos e não alterou a URL. Nenhum POST adicional foi feito. `generate_lead` continua ausente.
+
+## Problemas e correções
+
+1. A Política de Privacidade ainda mostrava a data de 4 de setembro. A data foi corrigida para 16 de setembro de 2026 antes do commit. A descrição técnica corresponde à implementação; a suficiência jurídica continua sujeita à confirmação da proprietária ou revisão profissional.
+2. O primeiro inventário das nove páginas aguardou 4,5 segundos e terminou antes do envio agrupado pelo navegador. A medição foi repetida com 5,7 segundos, confirmando um `page_view` em cada rota.
+3. O primeiro teste móvel do Cal.com ocorreu no navegador Chrome, cujo controle de viewport não alterou a janela existente. O teste foi repetido no navegador isolado com 390 × 844 e confirmou o layout móvel.
+4. O acesso ao relatório detalhado do GA4 ficou bloqueado pelo modal de comunicações por e-mail. Nenhuma preferência foi salva ou alterada sem autorização.
 
 Parâmetros UTM nunca devem conter nome, e-mail, telefone ou outro identificador pessoal.
 
@@ -194,27 +291,35 @@ Parâmetros UTM nunca devem conter nome, e-mail, telefone ou outro identificador
 
 ## Conclusão
 
-### Comprovado localmente
+### Comprovado em produção
 
+- commit, push, build e deploy do código autorizado;
+- domínio, HTTPS, CNAME e nove rotas preservados;
 - GA4 centralizado com o ID correto nas nove páginas indexáveis;
 - modelo básico sem carregamento ou coleta antes do consentimento;
 - consentimentos independentes para Analytics e Marketing;
-- persistência, reabertura e revogação das preferências;
-- um único `page_view` por carregamento nas nove rotas;
-- UTMs e informações técnicas básicas presentes na requisição;
-- integração oficial reconhecida pelo Tag Assistant;
+- recusa, aceite granular, aceite total, revisão, persistência e revogação;
+- um `page_view` por carregamento nas nove rotas, sem instalação duplicada;
+- UTMs presentes na requisição e ausência de parâmetros pessoais indevidos;
+- Tag Assistant reconhecendo uma tag, o consentimento correto e os hits;
+- fluxo GA4 recebendo tráfego e card de tempo real com um usuário ativo no Brasil;
 - Meta Pixel preservado e condicionado somente a Marketing;
+- Cal.com renderizado e utilizável em desktop e mobile, sob demanda e com UTMs;
 - formulário preservado e sem conversão falsa;
-- build, validações, console e responsividade aprovados;
-- ausência de GTM, `generate_lead`, dados pessoais novos e mudanças fora do escopo.
-- separação entre a fila interna de interações e o `dataLayer` reservado ao Google.
+- ausência de GTM, `generate_lead`, erros de console e mudanças fora do escopo.
 
-### Pendente
+### Pendente de validação
 
-- revisão da proprietária;
-- commit, push e deploy, todos não autorizados nesta etapa;
-- confirmação no Tempo real/DebugView e no domínio publicado depois do deploy;
-- confirmação completa do conteúdo remoto do Cal.com em nova rodada pós-deploy, embora script e iframe tenham sido criados sem erros locais;
-- futura especificação do backend verificável antes de qualquer `generate_lead`.
+- decidir e salvar as preferências de comunicações por e-mail exigidas pelo GA4 para liberar a inspeção do relatório detalhado;
+- depois disso, conferir no relatório detalhado de Tempo real ou DebugView os nomes dos eventos, páginas e campanha;
+- aguardar o processamento dos relatórios padrão para confirmar a atribuição final de origem, mídia e campanha;
+- confirmação da proprietária ou revisão profissional sobre a suficiência jurídica da Política de Privacidade.
 
-A Fase 4 permanece não iniciada.
+### Reservado para fases futuras
+
+- `generate_lead` somente depois de uma resposta verificável do backend;
+- eventual mudança do Apps Script ou do backend;
+- GTM e eventos personalizados adicionais;
+- artigos, estudos de caso, novas páginas e demais itens da Fase 4.
+
+Não há regressão crítica de consentimento, rastreamento básico ou agendamento. A Fase 3.6 está publicada e tecnicamente operacional, com as pendências de inspeção detalhada acima. A Fase 4 permanece não iniciada.
