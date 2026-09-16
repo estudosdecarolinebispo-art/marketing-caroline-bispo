@@ -1089,13 +1089,15 @@ summary:focus-visible {
     right: 24px;
     bottom: 24px;
     z-index: 1800;
-    width: min(760px, calc(100% - 48px));
+    width: min(980px, calc(100% - 48px));
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
+    grid-template-columns: minmax(0, 1fr) 190px;
+    align-items: start;
     gap: 28px;
     margin-inline: auto;
     padding: 22px 24px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
     color: var(--white);
     background: rgba(6, 20, 38, 0.98);
     border: 1px solid rgba(255, 255, 255, 0.13);
@@ -1107,7 +1109,7 @@ summary:focus-visible {
     display: none;
 }
 
-.cookie-banner strong {
+.cookie-banner #cookie-title {
     display: block;
     margin-bottom: 4px;
 }
@@ -1119,8 +1121,68 @@ summary:focus-visible {
     line-height: 1.55;
 }
 
+.cookie-options {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin: 16px 0 0;
+    padding: 0;
+    border: 0;
+}
+
+.cookie-options legend {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.cookie-option {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+    padding: 12px;
+    color: #dce6f1;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.cookie-option.is-required {
+    cursor: default;
+}
+
+.cookie-option input {
+    width: 18px;
+    height: 18px;
+    margin: 2px 0 0;
+    accent-color: var(--green-500);
+}
+
+.cookie-option-title {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--white);
+    font-size: 0.86rem;
+    font-weight: 800;
+}
+
+.cookie-option span span:last-child {
+    display: block;
+    color: #aebed0;
+    font-size: 0.76rem;
+    line-height: 1.45;
+}
+
 .cookie-actions {
-    display: flex;
+    display: grid;
     gap: 10px;
 }
 
@@ -1133,6 +1195,12 @@ summary:focus-visible {
 .cookie-reject {
     color: var(--white);
     background: transparent;
+    border-color: rgba(255, 255, 255, 0.38);
+}
+
+.cookie-save {
+    color: var(--white);
+    background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.38);
 }
 
@@ -2112,6 +2180,10 @@ summary:focus-visible {
         grid-template-columns: 1fr;
         gap: 18px;
     }
+
+    .cookie-actions {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
 }
 
 @media (max-width: 680px) {
@@ -2388,11 +2460,15 @@ summary:focus-visible {
         bottom: calc(78px + env(safe-area-inset-bottom));
         width: calc(100% - 24px);
         padding: 18px;
+        max-height: calc(100vh - 102px - env(safe-area-inset-bottom));
+    }
+
+    .cookie-options {
+        grid-template-columns: 1fr;
     }
 
     .cookie-actions {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
     }
 
     .mobile-actions {

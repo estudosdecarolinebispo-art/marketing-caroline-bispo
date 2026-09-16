@@ -1,10 +1,26 @@
-    <aside class="cookie-banner" id="cookie-banner" aria-labelledby="cookie-title" hidden>
-        <div>
-            <strong id="cookie-title">Sua privacidade importa</strong>
-            <p>Usamos o Pixel da Meta para medir o resultado das campanhas. Você pode aceitar ou recusar; o formulário funciona normalmente em qualquer opção.</p>
+    <aside class="cookie-banner" id="cookie-banner" role="dialog" aria-labelledby="cookie-title" aria-describedby="cookie-description" hidden>
+        <div class="cookie-copy">
+            <strong id="cookie-title">Suas preferências de privacidade</strong>
+            <p id="cookie-description">Tecnologias opcionais só são carregadas nas categorias autorizadas. O formulário e a navegação funcionam mesmo se você recusar.</p>
+            <fieldset class="cookie-options">
+                <legend>Escolha as categorias permitidas</legend>
+                <label class="cookie-option is-required">
+                    <input type="checkbox" checked disabled>
+                    <span><span class="cookie-option-title">Essenciais</span><span>Guardam suas preferências e mantêm recursos básicos.</span></span>
+                </label>
+                <label class="cookie-option">
+                    <input id="cookie-analytics" type="checkbox">
+                    <span><span class="cookie-option-title">Analytics</span><span>Google Analytics 4 para páginas, origem de tráfego e dispositivo.</span></span>
+                </label>
+                <label class="cookie-option">
+                    <input id="cookie-marketing" type="checkbox">
+                    <span><span class="cookie-option-title">Marketing</span><span>Pixel da Meta para medir campanhas e interações autorizadas.</span></span>
+                </label>
+            </fieldset>
         </div>
         <div class="cookie-actions">
-            <button class="button cookie-reject" id="cookie-reject" type="button">Recusar</button>
-            <button class="button button-primary" id="cookie-accept" type="button">Aceitar</button>
+            <button class="button cookie-reject" id="cookie-reject" type="button">Recusar opcionais</button>
+            <button class="button cookie-save" id="cookie-save" type="button">Salvar preferências</button>
+            <button class="button button-primary" id="cookie-accept" type="button">Aceitar todos</button>
         </div>
     </aside>

@@ -7,24 +7,120 @@
     "use strict";
 
     var META_PIXEL_ID = "2429202777490521";
-    var COOKIE_CONSENT_KEY = "caroline_meta_consent_v1";
+    var GOOGLE_TAG_BASE_URL = "https://www.googletagmanager.com/gtag/js?id=";
+    var COOKIE_PREFERENCES_KEY = "caroline_cookie_preferences_v2";
+    var LEGACY_COOKIE_CONSENT_KEY = "caroline_meta_consent_v1";
+    var CONSENT_VERSION = 2;
     var CAL_EMBED_SCRIPT = "https://app.cal.com/embed/embed.js";
     var CAL_PUBLIC_URL = "https://cal.com/caroline-bispo/agendamentos";
+    var memoryPreferences = null;
 
-    function getCookieConsent() {
+    function validPreferences(value) {
+        return value &&
+            value.version === CONSENT_VERSION &&
+            typeof value.analytics === "boolean" &&
+            typeof value.marketing === "boolean";
+    }
+
+    function getConsentPreferences() {
+        if (memoryPreferences) return memoryPreferences;
+
         try {
-            return window.localStorage.getItem(COOKIE_CONSENT_KEY);
+            var storedValue = window.localStorage.getItem(COOKIE_PREFERENCES_KEY);
+            var storedPreferences = storedValue ? JSON.parse(storedValue) : null;
+
+            if (validPreferences(storedPreferences)) {
+                memoryPreferences = storedPreferences;
+                return memoryPreferences;
+            }
+
+            var legacyConsent = window.localStorage.getItem(LEGACY_COOKIE_CONSENT_KEY);
+            if (legacyConsent === "accepted") {
+                memoryPreferences = { version: CONSENT_VERSION, analytics: null, marketing: true };
+                return memoryPreferences;
+            }
+            if (legacyConsent === "rejected") {
+                memoryPreferences = { version: CONSENT_VERSION, analytics: false, marketing: false };
+                return memoryPreferences;
+            }
         } catch (error) {
-            return null;
+            // Sem armazenamento, as escolhas continuam válidas durante esta visita.
+        }
+
+        memoryPreferences = { version: CONSENT_VERSION, analytics: null, marketing: null };
+        return memoryPreferences;
+    }
+
+    function setConsentPreferences(preferences) {
+        memoryPreferences = {
+            version: CONSENT_VERSION,
+            analytics: preferences.analytics === true,
+            marketing: preferences.marketing === true
+        };
+
+        try {
+            window.localStorage.setItem(COOKIE_PREFERENCES_KEY, JSON.stringify(memoryPreferences));
+            window.localStorage.removeItem(LEGACY_COOKIE_CONSENT_KEY);
+        } catch (error) {
+            // As preferências continuam válidas nesta visita se o armazenamento estiver bloqueado.
         }
     }
 
-    function setCookieConsent(value) {
-        try {
-            window.localStorage.setItem(COOKIE_CONSENT_KEY, value);
-        } catch (error) {
-            // O consentimento ainda vale para esta visita se o armazenamento estiver bloqueado.
+    function getGoogleAnalyticsId() {
+        var meta = document.querySelector('meta[name="google-analytics-id"]');
+        return meta ? meta.getAttribute("content").trim() : "";
+    }
+
+    function loadGoogleAnalytics() {
+        var measurementId = getGoogleAnalyticsId();
+        if (!measurementId || window.__carolineGa4Configured) return;
+        if (getConsentPreferences().analytics !== true) return;
+
+        window.__carolineGa4Configured = true;
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = window.gtag || function () {
+            window.dataLayer.push(arguments);
+        };
+
+        var googleTag = document.createElement("script");
+        googleTag.async = true;
+        googleTag.src = GOOGLE_TAG_BASE_URL + encodeURIComponent(measurementId);
+        googleTag.dataset.carolineGa4 = "true";
+        document.head.appendChild(googleTag);
+
+        window.gtag("consent", "default", {
+            analytics_storage: "denied",
+            ad_storage: "denied",
+            ad_user_data: "denied",
+            ad_personalization: "denied"
+        });
+        window.gtag("consent", "update", {
+            analytics_storage: "granted",
+            ad_storage: "denied",
+            ad_user_data: "denied",
+            ad_personalization: "denied"
+        });
+        window.gtag("js", new Date());
+
+        var configuration = {
+            send_page_view: true,
+            allow_google_signals: false,
+            allow_ad_personalization_signals: false
+        };
+        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+            configuration.debug_mode = true;
         }
+        window.gtag("config", measurementId, configuration);
+    }
+
+    function revokeGoogleAnalytics() {
+        if (typeof window.gtag !== "function") return;
+        window.gtag("consent", "update", {
+            analytics_storage: "denied",
+            ad_storage: "denied",
+            ad_user_data: "denied",
+            ad_personalization: "denied"
+        });
     }
 
     function loadMetaPixel() {
@@ -52,7 +148,7 @@
     }
 
     function trackMetaEvent(eventName, details) {
-        if (getCookieConsent() !== "accepted" || typeof window.fbq !== "function") return;
+        if (getConsentPreferences().marketing !== true || typeof window.fbq !== "function") return;
         window.fbq("track", eventName, details || {});
     }
 
@@ -62,8 +158,8 @@
             page_path: window.location.pathname
         }, details || {});
 
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push(eventData);
+        window.carolineDataLayer = window.carolineDataLayer || [];
+        window.carolineDataLayer.push(eventData);
         window.dispatchEvent(new CustomEvent("caroline:conversion", { detail: eventData }));
     }
 
@@ -270,32 +366,66 @@
         var banner = document.getElementById("cookie-banner");
         var acceptButton = document.getElementById("cookie-accept");
         var rejectButton = document.getElementById("cookie-reject");
+        var saveButton = document.getElementById("cookie-save");
+        var analyticsInput = document.getElementById("cookie-analytics");
+        var marketingInput = document.getElementById("cookie-marketing");
         var preferencesButton = document.getElementById("cookie-preferences");
-        if (!banner || !acceptButton || !rejectButton) return;
+        if (!banner || !acceptButton || !rejectButton || !saveButton || !analyticsInput || !marketingInput) return;
 
-        var consent = getCookieConsent();
-        if (consent === "accepted") {
-            loadMetaPixel();
-        } else if (!consent) {
+        function syncInputs(preferences) {
+            analyticsInput.checked = preferences.analytics === true;
+            marketingInput.checked = preferences.marketing === true;
+        }
+
+        function applyPreferences(nextPreferences) {
+            var previousPreferences = getConsentPreferences();
+            var shouldReload =
+                (previousPreferences.analytics === true && nextPreferences.analytics !== true) ||
+                (previousPreferences.marketing === true && nextPreferences.marketing !== true);
+
+            setConsentPreferences(nextPreferences);
+            banner.hidden = true;
+
+            if (nextPreferences.analytics) loadGoogleAnalytics();
+            else revokeGoogleAnalytics();
+
+            if (nextPreferences.marketing) loadMetaPixel();
+            else if (typeof window.fbq === "function") window.fbq("consent", "revoke");
+
+            if (shouldReload) window.location.reload();
+        }
+
+        var preferences = getConsentPreferences();
+        syncInputs(preferences);
+
+        if (preferences.analytics === true) loadGoogleAnalytics();
+        if (preferences.marketing === true) loadMetaPixel();
+        if (typeof preferences.analytics !== "boolean" || typeof preferences.marketing !== "boolean") {
             banner.hidden = false;
         }
 
         acceptButton.addEventListener("click", function () {
-            setCookieConsent("accepted");
-            banner.hidden = true;
-            loadMetaPixel();
+            syncInputs({ analytics: true, marketing: true });
+            applyPreferences({ analytics: true, marketing: true });
         });
 
         rejectButton.addEventListener("click", function () {
-            setCookieConsent("rejected");
-            banner.hidden = true;
-            if (typeof window.fbq === "function") window.fbq("consent", "revoke");
+            syncInputs({ analytics: false, marketing: false });
+            applyPreferences({ analytics: false, marketing: false });
+        });
+
+        saveButton.addEventListener("click", function () {
+            applyPreferences({
+                analytics: analyticsInput.checked,
+                marketing: marketingInput.checked
+            });
         });
 
         if (preferencesButton) {
             preferencesButton.addEventListener("click", function () {
+                syncInputs(getConsentPreferences());
                 banner.hidden = false;
-                acceptButton.focus();
+                analyticsInput.focus();
             });
         }
     }

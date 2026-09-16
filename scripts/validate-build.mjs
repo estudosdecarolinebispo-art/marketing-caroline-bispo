@@ -53,7 +53,7 @@ const expectedFiles = [
 
 const fixedAssetHashes = {
   "legal.css": "fb7b14390a5eb0703a7797d19c6cfdecdee231022fe24a4e5e70dfbd38f14470",
-  "script.js": "2c60ebdd3be7d4227dd4912f0e51f40156ed5c0933d2532e4da5d772b140ff8f",
+  "script.js": "97bd9f075c52467d0c5132f16a3cce9e7be1e5f12dcfe8c08cda572ccf8e9698",
   "CNAME": "8ee7ec57dcf1bec44660005adf24a479e04a656eaeb0a7629a52ccc5e9c6beb2",
   "site.webmanifest": "6b7665d9b363645475aa03d3310831de3bafa1912d101008e030190b7c55149f"
 };
@@ -211,6 +211,16 @@ if (!existsSync(outputDir)) {
     if (description !== page.description) fail(`${page.output}: description inesperada`);
 
     if (isIndexable) {
+      const analyticsMeta = attributes(html, "meta").filter((item) => item.name === "google-analytics-id");
+      if (analyticsMeta.length !== 1 || analyticsMeta[0].content !== site.integrations.gaMeasurementId) {
+        fail(`${page.output}: ID do Google Analytics ausente, incorreto ou duplicado`);
+      }
+      const staticGoogleTags = attributes(html, "script").filter((item) => /googletagmanager\.com|google-analytics\.com/i.test(item.src ?? ""));
+      if (staticGoogleTags.length) fail(`${page.output}: Google tag não deve carregar antes do consentimento`);
+      for (const consentId of ["cookie-banner", "cookie-analytics", "cookie-marketing", "cookie-reject", "cookie-save", "cookie-accept"]) {
+        if (!idValues.includes(consentId)) fail(`${page.output}: controle de consentimento ausente (${consentId})`);
+      }
+
       titleValues.push(title);
       descriptionValues.push(description);
 
@@ -268,6 +278,9 @@ if (!existsSync(outputDir)) {
 
       if (!html.includes('id="cookie-banner"')) fail(`${page.output}: banner de consentimento ausente`);
     } else {
+      if (attributes(html, "meta").some((item) => item.name === "google-analytics-id")) {
+        fail(`${page.output}: página legal não deve carregar a integração do Google Analytics`);
+      }
       if (/<script\s+type=["']application\/ld\+json["']/i.test(html)) fail(`${page.output}: página legal não deve emitir Schema editorial`);
     }
 
@@ -297,6 +310,19 @@ if (!existsSync(outputDir)) {
 
   if (new Set(titleValues).size !== indexablePages.length) fail("Titles das páginas indexáveis não são únicos");
   if (new Set(descriptionValues).size !== indexablePages.length) fail("Meta descriptions das páginas indexáveis não são únicas");
+
+  if (existsSync(path.join(outputDir, "script.js"))) {
+    const clientScript = read("script.js");
+    if (!clientScript.includes("https://www.googletagmanager.com/gtag/js?id=")) fail("script.js: loader oficial do Google tag ausente");
+    if (!clientScript.includes("caroline_cookie_preferences_v2")) fail("script.js: armazenamento versionado das preferências ausente");
+    if (!clientScript.includes("analytics_storage") || !clientScript.includes("ad_user_data") || !clientScript.includes("ad_personalization")) {
+      fail("script.js: estados de consentimento do Google incompletos");
+    }
+    if (!clientScript.includes("window.__carolineGa4Configured")) fail("script.js: proteção contra configuração duplicada do GA4 ausente");
+    if (!clientScript.includes("window.carolineDataLayer")) fail("script.js: fila interna deve permanecer separada do dataLayer do Google");
+    if (/generate_lead/i.test(clientScript)) fail("script.js: generate_lead não deve existir antes de confirmação verificável do formulário");
+    if (/GTM-[A-Z0-9]+/i.test(clientScript)) fail("script.js: Google Tag Manager não autorizado nesta fase");
+  }
 
   const contentLinkRequirements = {
     "index.html": ["/servicos/", ...services.order.map((key) => services.items[key].url), "/sobre/", "/diagnostico-google-meu-negocio/", "/contato/"],

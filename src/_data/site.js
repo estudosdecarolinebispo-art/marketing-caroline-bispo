@@ -31,6 +31,7 @@ export default {
   },
   integrations: {
     formAction: "https://script.google.com/macros/s/AKfycbwomYhy8axlmoPtJo7Ppt7IrPEMrlSif4cE_r97rzM8W2ejA_FzktZ0vVDl0UXMDEX-/exec",
+    gaMeasurementId: "G-N5H2J8S9GL",
     metaPixelId: "2429202777490521",
     calLink: "caroline-bispo/agendamentos",
     calPublicUrl: "https://cal.com/caroline-bispo/agendamentos"
