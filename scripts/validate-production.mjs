@@ -1,4 +1,5 @@
 import pages from "../src/_data/pages.js";
+import services from "../src/_data/services.js";
 import site from "../src/_data/site.js";
 
 const origin = (process.argv[2] || site.url).replace(/\/$/, "");
@@ -8,6 +9,7 @@ const checks = [];
 const indexablePages = pages.indexable;
 const legalPages = ["privacy", "terms", "deletion"].map((key) => ({ key, ...pages.entries[key] }));
 const htmlPages = [...indexablePages, ...legalPages];
+const llmsPages = ["home", "about", ...services.order, "diagnostic", "contact"].map((key) => pages.entries[key]);
 
 function fail(message) {
   failures.push(message);
@@ -102,6 +104,15 @@ for (const page of htmlPages) {
     const h1s = [...html.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>/gi)];
     if (h1s.length !== 1 || normalizedText(h1s[0][1]) !== page.h1) fail(`${page.url}: H1 divergente ou duplicado`);
     if (metaContent(html, "property", "og:url") !== canonical) fail(`${page.url}: og:url divergente`);
+    const socialExpectations = [
+      ["property", "og:title", page.title],
+      ["property", "og:description", page.description],
+      ["name", "twitter:title", page.title],
+      ["name", "twitter:description", page.description]
+    ];
+    for (const [selector, name, expected] of socialExpectations) {
+      if (metaContent(html, selector, name) !== expected) fail(`${page.url}: metadado ${name} divergente`);
+    }
     if (!attributes(html, "link").some((item) => item.rel === "describedby" && item.href === "/llms.txt")) {
       fail(`${page.url}: link describedby para /llms.txt ausente`);
     }
@@ -114,7 +125,15 @@ for (const page of htmlPages) {
     for (const type of ["Person", "WebSite", "ImageObject"]) {
       if (!types.includes(type)) fail(`${page.url}: Schema ${type} ausente`);
     }
+    const expectedPageType = page.key === "about" ? "ProfilePage" : page.key === "services" ? "CollectionPage" : page.key === "contact" ? "ContactPage" : "WebPage";
+    if (!types.includes(expectedPageType)) fail(`${page.url}: Schema ${expectedPageType} ausente`);
     if (page.key !== "home" && indexable && !types.includes("BreadcrumbList")) fail(`${page.url}: BreadcrumbList ausente`);
+    if (page.key === "home" && types.includes("BreadcrumbList")) fail(`${page.url}: BreadcrumbList inesperado na home`);
+
+    const serviceCount = types.filter((type) => type === "Service").length;
+    if (services.order.includes(page.key) && serviceCount !== 1) fail(`${page.url}: esperado um Schema Service`);
+    else if (page.key === "services" && serviceCount !== services.order.length) fail(`${page.url}: esperados ${services.order.length} Schemas Service`);
+    else if (!services.order.includes(page.key) && page.key !== "services" && serviceCount !== 0) fail(`${page.url}: Schema Service inesperado`);
   }
 
   if (response.ok) pass(`${page.url} — HTTP ${response.status}, metadados${indexable ? " e Schema" : ""} válidos`);
@@ -124,6 +143,9 @@ const sitemapResponse = await request("/sitemap.xml");
 if (sitemapResponse) {
   const sitemap = await sitemapResponse.text();
   if (!sitemapResponse.headers.get("content-type")?.includes("xml")) fail("/sitemap.xml: Content-Type não é XML");
+  const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
+  const expectedSitemapUrls = indexablePages.map((page) => `${origin}${page.url}`);
+  if (JSON.stringify(sitemapUrls) !== JSON.stringify(expectedSitemapUrls)) fail("/sitemap.xml: conjunto ou ordem das URLs diverge das nove páginas aprovadas");
   for (const page of indexablePages) {
     const loc = `<loc>${origin}${page.url}</loc>`;
     if (!sitemap.includes(loc)) fail(`/sitemap.xml: URL ausente (${page.url})`);
@@ -146,10 +168,10 @@ if (robotsResponse) {
 const llmsResponse = await request("/llms.txt");
 if (llmsResponse) {
   const llms = await llmsResponse.text();
-  for (const page of indexablePages) {
-    if (!llms.includes(`${origin}${page.url}`)) fail(`/llms.txt: URL ausente (${page.url})`);
-  }
-  pass("/llms.txt — páginas indexáveis declaradas");
+  const llmsUrls = [...llms.matchAll(/\]\((https:\/\/www\.carolinebispo\.com\.br\/[^)]*)\)/g)].map((match) => match[1]);
+  const expectedLlmsUrls = llmsPages.map((page) => `${origin}${page.url}`);
+  if (JSON.stringify(llmsUrls) !== JSON.stringify(expectedLlmsUrls)) fail("/llms.txt: conjunto ou ordem das oito URLs aprovadas diverge");
+  pass("/llms.txt — oito páginas existentes declaradas, sem referências futuras");
 }
 
 for (const asset of ["/style.css", "/script.js", "/site.webmanifest", "/favicon.ico", "/CNAME"]) {
